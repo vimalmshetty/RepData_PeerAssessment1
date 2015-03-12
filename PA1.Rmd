@@ -2,7 +2,7 @@
 title: "ASSIGNMENT 1 - Reproducible Research"
 author: "Vimal Kumar M"
 date: "Thursday, March 12, 2015"
-output: html_document
+output: pdf_document
 ---
 ```{r message=FALSE, warning=FALSE}
 library("dplyr")

@@ -1,69 +1,38 @@
----
-title: "ASSIGNMENT 1 - Reproducible Research"
-author: "Vimal Kumar M"
-date: "Thursday, March 12, 2015"
-output: html_document
----
-```{r message=FALSE, warning=FALSE}
-library("dplyr")
-library("sqldf")
-library("ggplot2")
-```
-## Loading and preprocessing the data
-Load the data and store it into data frome *activity*
-```{r}
-#Please change the working directory according to your storage location
 setwd("G:/vimal/data science/JHU/RepResearch/RepData_PeerAssessment1/")
 activity <- read.csv("activity.csv")
 head(activity)
-```
+summary(activity)
 
-##What is mean total number of steps taken per day?
+library("dplyr")
+library("sqldf")
+library("ggplot2")
 
-*Make a histogram of the total number of steps taken each day*
-
-```{r}
 act_dt <- group_by(activity, date)
 sum_act <- summarise(act_dt, tot = sum(steps))
 sum_act$date <- as.Date(sum_act$date)
 hist(sum_act$tot, breaks = 10, 
      main = 'Histogram of No. of steps taken per day',
-     xlab = 'No. of Steps per Day')  
-```
-
-*Calculate and report the mean and median of the total number of steps taken per day*
-
-```{r}
+     xlab = 'No. of Steps per Day')
 act_mean <- as.integer(mean(sum_act$tot, na.rm = T))
 act_median<- median(sum_act$tot, na.rm = T)
-```
-**The mean steps taken per day is `r act_mean` and the median is `r act_median`.**
+??as.int
+?round
+?plot
+rm(act_dt)
 
-
-##What is the average daily activity pattern?
-```{r}
+rm(avt_act)
 act_dt <- group_by(activity, interval)
-avt_act <- summarise(act_dt, mn = mean(steps, na.rm = TRUE))
+avt_act <- summarise(act_dt, mn = mean(steps, na.rm = T))
 max_steps <- avt_act[which.max(avt_act$mn),]
 plot(avt_act, type = 'l', 
      main = 'Average Daily Activity Pattern', 
      xlab = 'Interval in 5 Mins',
      ylab = 'Mean')
-```
 
-**The interval in which we have maximum steps is *`r max_steps$interval`* and maximum number of steps are `r as.integer(max_steps$mn)`.**
-
-
-## Imputing missing values
-*Calculate and report the total number of missing values in the dataset*
-```{r}
 cnt <- table(is.na(activity$steps))
-```
+as.integer(cnt['TRUE'])
 
-**The number of rows with missing value is `r as.integer(cnt['TRUE'])`**
 
-*We replace all NA's with the mean number of steps for that interval
-```{r}
 activity_new <- activity
 for(i in 1:nrow(activity_new)){
      if(is.na(activity_new$steps[i])){
@@ -75,25 +44,15 @@ for(i in 1:nrow(activity_new)){
 act_dt <- group_by(activity_new, date)
 sum_act <- summarise(act_dt, tot = sum(steps))
 sum_act$date <- as.Date(sum_act$date)
-act_mean <- as.integer(mean(sum_act$tot))
-act_median<- median(sum_act$tot)
 hist(sum_act$tot, breaks = 10, 
      main = 'Histogram of No. of steps taken per day(w/o NA)',
      xlab = 'No. of Steps per Day')
-```
-
-**The mean steps taken per day after replacing the NAs is `r act_mean` and the median is `r act_median`.**
-
-
-## Are there differences in activity patterns between weekdays and weekends?
-**creating a data frame using the above dataset with NAs and adding two colums**
-
-1. weekday: saves the day of the week
-2. iswd: is weekend? saves values 'weekday' or 'weekend'
-
-```{r results='hide',message=FALSE, warning=FALSE}
+act_mean <- as.integer(mean(sum_act$tot))
+act_median<- median(sum_act$tot)
 activity_new$date <- as.Date(activity_new$date)
+
 activity_new$weekday <- weekdays(activity_new$date)
+View(activity_new)
 actn <- activity_new
 sqldf()
 query <- "select a.*, (CASE a.weekday WHEN 'Sunday' THEN 'weekend' 
@@ -107,13 +66,7 @@ activity_new$iswd <- as.factor(activity_new$iswd)
 act_dt <- group_by(activity_new, iswd, interval)
 avt_act <- summarise(act_dt, mn = mean(steps, na.rm = T))
 max_steps <- avt_act[which.max(avt_act$mn),]
-```
-
-*X-Y Plot for Weekend and Weekday Activity to compare both*
-```{r}
 qplot(x = interval, y = mn, data = avt_act,
       geom = c("line"), main = '' ,ylab = 'Number of steps')+
       facet_wrap ( ~ iswd, ncol = 1)
-```
 
-**From the obove plot, we can infer that the average activty is less on Weekends compare to weekdays.**
