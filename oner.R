@@ -70,3 +70,7 @@ qplot(x = interval, y = mn, data = avt_act,
       geom = c("line"), main = '' ,ylab = 'Number of steps')+
       facet_wrap ( ~ iswd, ncol = 1)
 
+??knit2html()
+library(knitr)
+?knit2html
+knit2html("PA1_template.Rmd");
